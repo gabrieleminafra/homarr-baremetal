@@ -1,0 +1,13 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+*.md
+.git
+.github
+LICENSE
+docs/
+*.sqlite
+*.env
+.env
+.next/standalone/.env
