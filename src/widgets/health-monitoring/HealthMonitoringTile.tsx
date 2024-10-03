@@ -161,7 +161,7 @@ export const ringColor = (percentage: number) => {
 
 const useStatusQuery = () => {
   return api.healthMonitoring.fetchStatus.useQuery(undefined, {
-    refetchInterval: 3000,
+    refetchInterval: 2000,
   });
 };
 

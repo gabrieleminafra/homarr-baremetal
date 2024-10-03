@@ -2,6 +2,6 @@ import { api } from '~/utils/api';
 
 export const useGetDownloadClientsQueue = () => {
   return api.download.get.useQuery(undefined, {
-    refetchInterval: 3000,
+    refetchInterval: 2000,
   });
 };
