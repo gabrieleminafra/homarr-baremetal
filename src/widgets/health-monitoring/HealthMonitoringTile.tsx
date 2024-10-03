@@ -64,13 +64,18 @@ interface HealthMonitoringWidgetProps {
 }
 function HealthMonitoringWidgetTile({ widget }: HealthMonitoringWidgetProps) {
   const { t } = useTranslation('modules/health-monitoring');
-  let { data, isInitialLoading, isError } = useStatusQuery();
+  let {
+    data: status,
+    isInitialLoading: isInitLoadStats,
+    isError: isErrorStatus,
+  } = useStatusQuery();
+  let { data: disk, isInitialLoading: isInitLoadDisk } = useDiskQuery();
 
-  if (isInitialLoading) {
+  if (isInitLoadDisk || isInitLoadStats) {
     return <WidgetLoading />;
   }
 
-  if (isError || !data) {
+  if (isErrorStatus || !status) {
     return (
       <Center>
         <Stack align="center">
@@ -98,12 +103,22 @@ function HealthMonitoringWidgetTile({ widget }: HealthMonitoringWidgetProps) {
         <IconHeartRateMonitor />
         <Title order={4}>{t('descriptor.name')}</Title>
       </Group>
-      {data.system && <SystemStatusTile data={data.system} properties={widget.properties} />}
+      {status.system && (
+        <SystemStatusTile data={status.system} disk={disk} properties={widget.properties} />
+      )}
     </ScrollArea>
   );
 }
 
-const SystemStatusTile = ({ data, properties }: { data: any; properties: any }) => {
+const SystemStatusTile = ({
+  data,
+  disk,
+  properties,
+}: {
+  data: any;
+  disk: any;
+  properties: any;
+}) => {
   const { t } = useTranslation('modules/health-monitoring');
 
   return (
@@ -127,10 +142,10 @@ const SystemStatusTile = ({ data, properties }: { data: any; properties: any }) 
         )}
         {properties.memory && <HealthMonitoringMemory info={data.systemInfo} />}
       </Group>
-      {properties.fileSystem && (
+      {properties.fileSystem && disk && (
         <>
           <Divider my="sm" />
-          <HealthMonitoringFileSystem fileSystem={data.fileSystem} />
+          <HealthMonitoringFileSystem fileSystem={disk} />
         </>
       )}
     </Stack>
@@ -145,9 +160,13 @@ export const ringColor = (percentage: number) => {
 };
 
 const useStatusQuery = () => {
-  return api.healthMonitoring.fetchData.useQuery(undefined, {
+  return api.healthMonitoring.fetchStatus.useQuery(undefined, {
     refetchInterval: 3000,
   });
+};
+
+const useDiskQuery = () => {
+  return api.healthMonitoring.fetchDisk.useQuery();
 };
 
 export default definition;
